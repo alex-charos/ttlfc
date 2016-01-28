@@ -3,6 +3,8 @@ package com.spectral.ttlfc.service.impl;
  
 import java.util.Deque;
 
+import org.apache.log4j.Logger;
+
 import com.spectral.ttlfc.model.Card;
 import com.spectral.ttlfc.model.CardFaceOff;
 import com.spectral.ttlfc.model.PlayerHand;
@@ -10,6 +12,9 @@ import com.spectral.ttlfc.model.Trick;
 import com.spectral.ttlfc.service.CardGame;
 
 public class CardGameImpl implements CardGame {
+	
+	Logger logger = Logger.getLogger(getClass());
+	
 	
 	private Deque<PlayerHand> players;
 
@@ -47,7 +52,7 @@ public class CardGameImpl implements CardGame {
 			if (winningValue==null || currentValue > winningValue) {
 				winningValue = currentValue;
 				winner = cfo.getPlayer();
-				System.out.println("Currently :" +winner + " wins");
+				logger.info("Currently :" +winner + " wins");
 			}
 			
 		}

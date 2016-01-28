@@ -3,7 +3,10 @@ package com.spectral.ttlfc;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -35,11 +38,33 @@ public class CardGameTest {
 	@Test
 	public void testGame() {
 		CardGame g = getCardGame();
-		PlayerHand ph = g.getPlayerTurn();
-		System.out.println(ph.getPlayer() + " Plays...");
 		
-		g.executeTrick("attr 1");
-		
+		for (PlayerHand ph : g.getPlayers()) {
+			int i =0;
+			if (!ph.getPlayer().getEmail().equals("alex@alex.com")) {
+				i=1*100;
+			}  
+			
+			
+			for (Card c : ph.getCards()) {
+				c.getAttributes().put("testAttr", (double)i++);
+			}
+		 
+			for (Card c : ph.getCards()) {
+				c.getAttributes().put("testAttr", (double)i++);
+				 
+			}
+			 
+		}
+		g.executeTrick("testAttr");
+		for (PlayerHand phzz : g.getPlayers()) {
+			if ( phzz.getPlayer().getEmail().equals("alex@alex.com")) {
+				assertEquals(4, phzz.getCards().size());
+			} else {
+				assertEquals(6, phzz.getCards().size());
+			}
+			 
+		}
 		
 		
 		
