@@ -1,4 +1,4 @@
-package com.spectral.ttlfc;
+package com.spectral.ttlfc.test.service;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,13 +39,13 @@ public class CardGameTest {
 	@Test
 	public void testGame() {
 		CardGame g = getCardGame();
-		
+		Player playerToPlay = null;
 		for (PlayerHand ph : g.getPlayers()) {
 			int i =0;
 			if (!ph.getPlayer().getEmail().equals("alex@alex.com")) {
 				i=1*100;
-			}  
-			
+				playerToPlay = ph.getPlayer();
+			}   
 			
 			for (Card c : ph.getCards()) {
 				c.getAttributes().put("testAttr", (double)i++);
@@ -53,11 +53,9 @@ public class CardGameTest {
 		 
 			for (Card c : ph.getCards()) {
 				c.getAttributes().put("testAttr", (double)i++);
-				 
 			}
-			 
 		}
-		TrickResult tr =  g.executeTrick("testAttr");
+		TrickResult tr =  g.executeTrick(playerToPlay,"testAttr" );
 		System.out.println(tr);
 		for (PlayerHand phzz : g.getPlayers()) {
 			if ( phzz.getPlayer().getEmail().equals("alex@alex.com")) {
@@ -73,28 +71,27 @@ public class CardGameTest {
 	}
 	
 	private CardGame getCardGame() {
-		CardGame game = new CardGameImpl();
-		
-		Deque<PlayerHand> players = getTwoPlayerHands();
-		game.dealDeck(getDeck(10), players);
+		Deque<Player> players = getTwoPlayers();
+		CardGame game = new CardGameImpl(players);
+		game.dealDeck(getDeck(10));
 		
 		return game;
 	}
 	
 	private void testDealCorrect(int positionToDeal) {
-		CardGame game = new CardGameImpl();
+		Deque<Player> players = getTwoPlayers();
+		CardGame game = new CardGameImpl(players);
 		
-		Deque<PlayerHand> players = getTwoPlayerHands();
 		int i=0;
 		PlayerHand dealer = null;
-		for (PlayerHand p : players) {
+		for (PlayerHand p : game.getPlayers()) {
 			if (i==positionToDeal) {
 				p.setDealing(true);
 				dealer = p;
 			}
 			i++;
 		}
-		game.dealDeck(getDeck(11), players);
+		game.dealDeck(getDeck(11));
 		
 		for (PlayerHand ph : game.getPlayers()) {
 			if (ph.equals(dealer)) {
@@ -111,19 +108,16 @@ public class CardGameTest {
 	
 	
 	
-	private Deque<PlayerHand> getTwoPlayerHands(){
+	private Deque<Player> getTwoPlayers(){
 		Player p1 = new Player();
 		p1.setEmail("alex@alex.com");
 		Player p2 = new Player();
 		p2.setEmail("christine@alex.com");
 		
-		PlayerHand ph1 = new PlayerHand(p1);
-		PlayerHand ph2 = new PlayerHand(p2);
-		
-		
-		Deque<PlayerHand> players = new LinkedList<PlayerHand>();
-		players.add(ph1);
-		players.add(ph2);
+	 
+		Deque<Player> players = new LinkedList<Player>();
+		players.add(p1);
+		players.add(p2);
 		
 		return players;
 	}

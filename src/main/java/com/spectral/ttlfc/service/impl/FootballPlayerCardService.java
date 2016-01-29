@@ -1,9 +1,13 @@
 package com.spectral.ttlfc.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,14 +17,16 @@ import com.spectral.ttlfc.model.Card;
 import com.spectral.ttlfc.service.CardService;
 import com.spectral.ttlfc.utils.HTTPUtil;
 
-public class PlayerCardService implements CardService{
+@Component("footballCardService")
+public class FootballPlayerCardService implements CardService{
 	
 	private String apiUrl ="http://api.football-data.org/v1/soccerseasons";
 	private String apiToken = "79e23fafd923491b91572cde3c9d41e3";
 	private SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
 	JsonParser parser = new JsonParser();
-	public Set<Card> generateCards() {
-		Set<Card> cards = new HashSet<Card>();
+	public Deque<Card> generateCards(Integer totals) {
+		
+		Deque<Card> cards = new LinkedList<Card>();
 		try {
 			String seasonsJson = HTTPUtil.readUrl(apiUrl,apiToken);
 			JsonArray seasons = parser.parse(seasonsJson).getAsJsonArray();
@@ -67,6 +73,9 @@ public class PlayerCardService implements CardService{
 							c.getAttributes().put("ageInYears", (double)diffInYears);
 							
 							cards.add(c);
+							if (totals!=null && cards.size() >= totals) {
+								return cards;
+							}
 						} catch (Exception ex) {
 							System.out.println(ex.getMessage());
 						}
@@ -80,9 +89,17 @@ public class PlayerCardService implements CardService{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
 		return cards;
+	}
+	
+	private Deque<Card> shuffleCards(LinkedList<Card> cards){
+		 Collections.shuffle(cards);
+		Deque<Card> shuffledQ = new LinkedList<Card>();
+		for (Card c : cards) {
+			shuffledQ.push(c);
+		}
+		
+		return shuffledQ;
 	}
 
 }

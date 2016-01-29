@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
+import com.spectral.ttlfc.exception.NotYourTurnException;
 import com.spectral.ttlfc.model.Card;
 import com.spectral.ttlfc.model.CardFaceOff;
 import com.spectral.ttlfc.model.Player;
@@ -13,36 +14,49 @@ import com.spectral.ttlfc.model.PlayerHand;
 import com.spectral.ttlfc.model.Trick;
 import com.spectral.ttlfc.model.TrickResult;
 import com.spectral.ttlfc.service.CardGame;
+import com.spectral.ttlfc.utils.GameStatus;
 import com.spectral.ttlfc.utils.TrickOutcome;
 
 public class CardGameImpl implements CardGame {
 	
 	Logger logger = Logger.getLogger(getClass());
 	
-	
+	private GameStatus status;
 	private Deque<PlayerHand> players;
 	private Deque<Card> cardsOnHold;
 
-	public void dealDeck(Deque<Card> deck, Deque<PlayerHand> players) {
+	public CardGameImpl(Deque<Player> players) {
+		int i =0;
+		if (players !=null){
+			for (Player p : players) {
+				PlayerHand ph = new PlayerHand(p);
+				if (i==0) {
+					ph.setDealing(true);
+				}
+				getPlayers().add(ph);
+				i++;
+			}
+		}
+		status = GameStatus.waitingToDeal;
+	}
+	
+	public void dealDeck(Deque<Card> deck) {
 		players = sortPlayers(players);
 		players = dealCards(deck, players);
 		setPlayers(players);
-	}
-	
-	
-
-	public PlayerHand getPlayerTurn() {
-		return getPlayers().peek();
+		status = GameStatus.waitingToDeal;
 	}
 
-	public TrickResult executeTrick(String attribute) {
-	
+
+	public TrickResult executeTrick(Player p, String attribute) throws NotYourTurnException {
+		if (!p.equals(getPlayerTurn())) {
+			throw new NotYourTurnException();
+		}
 		Trick t = setupTrick(attribute);
 		
-		
 		PlayerHand winner = getWinner(t);
-		winner = manageWinner(winner,t);
 		
+		winner = manageWinner(winner,t);
 		removeLosers();
 		
 		TrickResult tr = getTrickResult(winner);
@@ -52,11 +66,19 @@ public class CardGameImpl implements CardGame {
 		return tr;
 	}
 	
+	public Player getPlayerTurn() {
+		return getPlayers().peek().getPlayer();
+	}
+	public GameStatus getStatus() {
+		return status;
+	}
+	
 	private TrickResult getTrickResult(PlayerHand winner){
 		TrickResult tr = new TrickResult();
 		if (getPlayers().size()==1) {
 			tr.setOutcome(TrickOutcome.gameWin);
 			tr.setPlayer(getPlayers().iterator().next().getPlayer());
+			status = GameStatus.finished;
 		} else {
 			if (winner == null) {
 				tr.setOutcome(TrickOutcome.roundDraw);
@@ -172,6 +194,9 @@ public class CardGameImpl implements CardGame {
 	}
 	
 	public Deque<PlayerHand> getPlayers() {
+		if (players == null) {
+			players = new LinkedList<PlayerHand>();
+		}
 		return players;
 	}
 	public void setPlayers(Deque<PlayerHand> players) {
@@ -192,5 +217,6 @@ public class CardGameImpl implements CardGame {
 	public void setCardsOnHold(Deque<Card> cardsOnHold) {
 		this.cardsOnHold = cardsOnHold;
 	}
+	
 
 }
