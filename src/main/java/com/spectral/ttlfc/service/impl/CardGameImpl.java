@@ -8,9 +8,12 @@ import org.apache.log4j.Logger;
 
 import com.spectral.ttlfc.model.Card;
 import com.spectral.ttlfc.model.CardFaceOff;
+import com.spectral.ttlfc.model.Player;
 import com.spectral.ttlfc.model.PlayerHand;
 import com.spectral.ttlfc.model.Trick;
+import com.spectral.ttlfc.model.TrickResult;
 import com.spectral.ttlfc.service.CardGame;
+import com.spectral.ttlfc.utils.TrickOutcome;
 
 public class CardGameImpl implements CardGame {
 	
@@ -32,17 +35,38 @@ public class CardGameImpl implements CardGame {
 		return getPlayers().peek();
 	}
 
-	public void executeTrick(String attribute) {
+	public TrickResult executeTrick(String attribute) {
 	
 		Trick t = setupTrick(attribute);
+		
 		
 		PlayerHand winner = getWinner(t);
 		winner = manageWinner(winner,t);
 		
 		removeLosers();
 		
+		TrickResult tr = getTrickResult(winner);
+		
 		PlayerHand next = getPlayers().remove();
 		getPlayers().add(next);
+		return tr;
+	}
+	
+	private TrickResult getTrickResult(PlayerHand winner){
+		TrickResult tr = new TrickResult();
+		if (getPlayers().size()==1) {
+			tr.setOutcome(TrickOutcome.gameWin);
+			tr.setPlayer(getPlayers().iterator().next().getPlayer());
+		} else {
+			if (winner == null) {
+				tr.setOutcome(TrickOutcome.roundDraw);
+			} else {
+				tr.setOutcome(TrickOutcome.roundWin);
+				tr.setPlayer(winner.getPlayer());
+			}
+		}
+		return tr;
+		
 	}
 	
 	private void removeLosers() {
@@ -73,7 +97,7 @@ public class CardGameImpl implements CardGame {
 	}
 	private PlayerHand manageWinner(PlayerHand winner, Trick t) {
 		if (winner!=null) {
-			System.out.println(winner + " Wins!!!");
+			logger.info(winner.getPlayer() + " Wins!!!");
 			winner.getCards().addAll(getCardsOnHold());
 			
 			for (CardFaceOff cfo : t.getCards()) {

@@ -13,6 +13,7 @@ import org.junit.Test;
 import com.spectral.ttlfc.model.Card;
 import com.spectral.ttlfc.model.Player;
 import com.spectral.ttlfc.model.PlayerHand;
+import com.spectral.ttlfc.model.TrickResult;
 import com.spectral.ttlfc.service.CardGame;
 import com.spectral.ttlfc.service.impl.CardGameImpl;
 
@@ -56,7 +57,8 @@ public class CardGameTest {
 			}
 			 
 		}
-		g.executeTrick("testAttr");
+		TrickResult tr =  g.executeTrick("testAttr");
+		System.out.println(tr);
 		for (PlayerHand phzz : g.getPlayers()) {
 			if ( phzz.getPlayer().getEmail().equals("alex@alex.com")) {
 				assertEquals(4, phzz.getCards().size());
