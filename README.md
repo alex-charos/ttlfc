@@ -4,3 +4,4 @@ The players are retrieved via the REST API given by the lovely fellas of http://
 
 This project will act as the back-end offering a REST API for playing trump cardds.
 
+The zero-th version of the API available exposes methods to enter lobby and play.
