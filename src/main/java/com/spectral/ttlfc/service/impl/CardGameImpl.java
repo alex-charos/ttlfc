@@ -2,6 +2,7 @@ package com.spectral.ttlfc.service.impl;
 
  
 import java.util.Deque;
+import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
@@ -17,6 +18,7 @@ public class CardGameImpl implements CardGame {
 	
 	
 	private Deque<PlayerHand> players;
+	private Deque<Card> cardsOnHold;
 
 	public void dealDeck(Deque<Card> deck, Deque<PlayerHand> players) {
 		players = sortPlayers(players);
@@ -31,6 +33,32 @@ public class CardGameImpl implements CardGame {
 	}
 
 	public void executeTrick(String attribute) {
+	
+		Trick t = setupTrick(attribute);
+		
+		PlayerHand winner = getWinner(t);
+		winner = manageWinner(winner,t);
+		
+		removeLosers();
+		
+		PlayerHand next = getPlayers().remove();
+		getPlayers().add(next);
+	}
+	
+	private void removeLosers() {
+		Deque<PlayerHand> phToRemove = new LinkedList<PlayerHand>();
+		for (PlayerHand ph : getPlayers()) {
+			if (ph.getCards().isEmpty()) {
+				phToRemove.add(ph);
+			}
+		}
+		
+		
+		getPlayers().removeAll(phToRemove);
+	}
+	
+	
+	private Trick setupTrick(String attribute) {
 		Trick t = new Trick();
 		t.setAttribute(attribute);
 		for (PlayerHand ph : getPlayers()) {
@@ -40,6 +68,29 @@ public class CardGameImpl implements CardGame {
 			t.getCards().add(cfo);
 		}
 		
+		
+		return t;
+	}
+	private PlayerHand manageWinner(PlayerHand winner, Trick t) {
+		if (winner!=null) {
+			System.out.println(winner + " Wins!!!");
+			winner.getCards().addAll(getCardsOnHold());
+			
+			for (CardFaceOff cfo : t.getCards()) {
+				winner.getCards().add(cfo.getCard());	
+			}
+			getCardsOnHold().clear();
+			
+		} else {
+			for (CardFaceOff cfo : t.getCards()) {
+				getCardsOnHold().add(cfo.getCard());
+			}
+			
+		}
+		return winner;
+	}
+
+	private PlayerHand getWinner(Trick t) {
 		PlayerHand winner = null;
 		Double winningValue = null;
 		for (CardFaceOff cfo :t.getCards()) {
@@ -52,22 +103,11 @@ public class CardGameImpl implements CardGame {
 			if (winningValue==null || currentValue > winningValue) {
 				winningValue = currentValue;
 				winner = cfo.getPlayer();
-				logger.info("Currently :" +winner + " wins");
-			}
-			
-		}
-		System.out.println(winner + " Wins!!!");
-		if (winner!=null) {
-			for (CardFaceOff cfo : t.getCards()) {
-				winner.getCards().add(cfo.getCard());	
+				logger.info("Currently :" + winner + " wins");
 			}
 		}
-		
-		PlayerHand next = getPlayers().remove();
-		getPlayers().add(next);
+		return winner;
 	}
-
-	
 	private Deque<PlayerHand> dealCards(Deque<Card> deck, Deque<PlayerHand> players) {
 		boolean startDealing = false;
 		while (!deck.isEmpty()) {
@@ -112,6 +152,21 @@ public class CardGameImpl implements CardGame {
 	}
 	public void setPlayers(Deque<PlayerHand> players) {
 		this.players = players;
+	}
+
+
+
+	public Deque<Card> getCardsOnHold() {
+		if (cardsOnHold==null) {
+			cardsOnHold = new LinkedList<Card>();
+		}
+		return cardsOnHold;
+	}
+
+
+
+	public void setCardsOnHold(Deque<Card> cardsOnHold) {
+		this.cardsOnHold = cardsOnHold;
 	}
 
 }
