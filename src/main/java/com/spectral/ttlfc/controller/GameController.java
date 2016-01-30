@@ -39,6 +39,11 @@ public class GameController {
 		
 		return hostImpl.acceptPlayer(p);
 	}
+	@RequestMapping(method=RequestMethod.GET, value="/my-update/{uuid}")
+	public PlayerEntryResponse getPlayerUpdate(@RequestParam UUID  uuid) {
+		
+		return hostImpl.getPlayerStatus(uuid);
+	}
 	
 	@RequestMapping(value="/game/{gameId/}deal")
 	public UUID deal(@RequestParam UUID gameId) {
