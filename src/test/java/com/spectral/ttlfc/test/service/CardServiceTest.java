@@ -15,7 +15,7 @@ public class CardServiceTest {
 	@Test
 	public void testGetCards(){
 		CardService cs = new FootballPlayerCardService();
-		assertEquals(10, cs.generateCards(10));
+		assertEquals(10, cs.generateCards(10).size());
 	}
 
 }
