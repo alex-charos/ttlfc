@@ -17,7 +17,7 @@ import com.spectral.ttlfc.service.CardGame;
 import com.spectral.ttlfc.utils.GameStatus;
 import com.spectral.ttlfc.utils.TrickOutcome;
 
-public class CardGameImpl implements CardGame {
+public class CardGameImpl extends CardGame {
 	
 	Logger logger = Logger.getLogger(getClass());
 	
@@ -26,17 +26,7 @@ public class CardGameImpl implements CardGame {
 	private Deque<Card> cardsOnHold;
 
 	public CardGameImpl(Deque<Player> players) {
-		int i =0;
-		if (players !=null){
-			for (Player p : players) {
-				PlayerHand ph = new PlayerHand(p);
-				if (i==0) {
-					ph.setDealing(true);
-				}
-				getPlayers().add(ph);
-				i++;
-			}
-		}
+		super(players);
 		status = GameStatus.waitingToDeal;
 	}
 	
