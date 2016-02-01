@@ -7,6 +7,8 @@ public class Trick {
 	
 	private List<CardFaceOff> cards;
 	private String attribute;
+	private TrickResult result;
+	private int id;
 	 
 	public String getAttribute() {
 		return attribute;
@@ -22,6 +24,18 @@ public class Trick {
 	}
 	public void setCards(List<CardFaceOff> cards) {
 		this.cards = cards;
+	}
+	public TrickResult getResult() {
+		return result;
+	}
+	public void setResult(TrickResult result) {
+		this.result = result;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 

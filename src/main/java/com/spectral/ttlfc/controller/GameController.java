@@ -1,5 +1,7 @@
 package com.spectral.ttlfc.controller;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,15 +9,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spectral.ttlfc.model.Player;
 import com.spectral.ttlfc.model.PlayerEntryResponse;
 import com.spectral.ttlfc.model.PlayerHand;
-import com.spectral.ttlfc.model.TrickResult;
+import com.spectral.ttlfc.model.Trick;
 import com.spectral.ttlfc.service.CardGame;
-import com.spectral.ttlfc.service.CardService;
 import com.spectral.ttlfc.service.Host;
 import com.spectral.ttlfc.service.Lobby;
 
@@ -28,14 +28,9 @@ public class GameController {
 	@Autowired
 	Lobby lobbyImpl;
 	
-	@Autowired
-	CardService footballPlayerCardService;
-
+	
 	@RequestMapping("/")
 	public String index() {
-		
-		String s = "sfsdf";
-		
 		return "Welcome to the Top Trumps app!";
 	}
 	
@@ -44,25 +39,26 @@ public class GameController {
 		
 		return hostImpl.acceptPlayer(p);
 	}
-	@RequestMapping(method=RequestMethod.GET, value="/my-update/{uuid}")
-	public PlayerEntryResponse getPlayerUpdate(@RequestParam UUID  uuid) {
+	@RequestMapping(method=RequestMethod.GET, value="my-update/{uuid}")
+	public PlayerEntryResponse getPlayerUpdate(@PathVariable UUID  uuid) {
 		
 		return hostImpl.getPlayerStatus(uuid);
 	}
-	
-	@RequestMapping(method=RequestMethod.GET, value="/game/{gameId}/deal")
-	public UUID deal(@PathVariable UUID gameId) {
+	@RequestMapping(method=RequestMethod.GET, value="game/turn/{gameId}")
+	public Map<String, Object> getPlayerTurnAndTrickHistory(@PathVariable UUID  gameId) {
 		CardGame game = lobbyImpl.getCardGames().get(gameId);
-		if (game!=null) {
-			game.dealDeck(footballPlayerCardService.generateCards(20));
-		}
-		return gameId;
+		Map<String, Object> ret = new HashMap<String, Object>();
+		ret.put("turn", game.getPlayerTurn());
+		ret.put("trickHistory", game.getTrickHistory());
+		return ret;
 	}
+	
+	 
 	@RequestMapping(method=RequestMethod.POST ,value="/game/{gameId}/trick/attribute/{attribute}")
-	public TrickResult trick(@PathVariable UUID gameId, @PathVariable String attribute, @RequestBody Player player) {
+	public Trick trick(@PathVariable UUID gameId, @PathVariable String attribute, @RequestBody Player player) {
 		CardGame game = lobbyImpl.getCardGames().get(gameId);
-		TrickResult tr =  game.executeTrick(player, attribute);
-		return tr;
+		Trick t =  game.executeTrick(player, attribute);
+		return t;
 	}
 	
 	@RequestMapping(method=RequestMethod.GET,value="/game/{gameId}/view-hand/{playerUUID}")

@@ -6,7 +6,7 @@ import com.spectral.ttlfc.exception.NotYourTurnException;
 import com.spectral.ttlfc.model.Card;
 import com.spectral.ttlfc.model.Player;
 import com.spectral.ttlfc.model.PlayerHand;
-import com.spectral.ttlfc.model.TrickResult;
+import com.spectral.ttlfc.model.Trick;
 import com.spectral.ttlfc.utils.GameStatus;
 
 public abstract class CardGame {
@@ -27,8 +27,9 @@ public abstract class CardGame {
 	}
 	public abstract void dealDeck(Deque<Card> deck);
 	public abstract Player getPlayerTurn();
-	public abstract TrickResult executeTrick(Player p,String attribute) throws NotYourTurnException;
+	public abstract Trick executeTrick(Player p,String attribute) throws NotYourTurnException;
 	public abstract Deque<PlayerHand> getPlayers();
 	public abstract GameStatus getStatus();
+	public abstract Deque<Trick> getTrickHistory();
 	
 }

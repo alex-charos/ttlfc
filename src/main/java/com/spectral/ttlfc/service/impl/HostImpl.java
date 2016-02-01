@@ -12,6 +12,7 @@ import com.spectral.ttlfc.model.Player;
 import com.spectral.ttlfc.model.PlayerEntryResponse;
 import com.spectral.ttlfc.model.PlayerHand;
 import com.spectral.ttlfc.service.CardGame;
+import com.spectral.ttlfc.service.CardService;
 import com.spectral.ttlfc.service.Host;
 import com.spectral.ttlfc.service.Lobby;
 import com.spectral.ttlfc.utils.CardGameType;
@@ -22,6 +23,10 @@ import com.spectral.ttlfc.utils.PlayerResponseType;
 public class HostImpl implements Host {
 	@Autowired
 	Lobby lobbyImpl;
+	
+	@Autowired
+	CardService footballPlayerCardService;
+
 	
 	private CardGameType gameType = CardGameType.standardCardGame;
 	
@@ -39,7 +44,8 @@ public class HostImpl implements Host {
 			players.add(playerToMatch);
 			players.add(p);
 			CardGame cg =  GameFactory.getGame(gameType, players);
-			
+			cg.dealDeck(footballPlayerCardService.generateCards(10));
+
 			UUID gameId = lobbyImpl.createCardGame(cg);
 			per.setGameToken(gameId);
 			per.setResponse(PlayerResponseType.enteredGame);
@@ -49,9 +55,9 @@ public class HostImpl implements Host {
 
 	public PlayerEntryResponse getPlayerStatus(UUID playerUUID) {
 		PlayerEntryResponse per = new PlayerEntryResponse();
+		per.setPlayerToken(playerUUID);
 		if (lobbyImpl.getWaitingRoom().keySet().contains(playerUUID)) {
 			per.setResponse(PlayerResponseType.inWaitingRoom);
-			per.setPlayerToken(playerUUID);
 		} else {
 			for (UUID uuid : lobbyImpl.getCardGames().keySet()) {
 				for ( PlayerHand pPlaying :lobbyImpl.getCardGames().get(uuid).getPlayers()) {

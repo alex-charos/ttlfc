@@ -3,10 +3,7 @@ package com.spectral.ttlfc.test.service;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +16,7 @@ import com.spectral.ttlfc.TopTrumps;
 import com.spectral.ttlfc.model.Card;
 import com.spectral.ttlfc.model.Player;
 import com.spectral.ttlfc.model.PlayerHand;
-import com.spectral.ttlfc.model.TrickResult;
+import com.spectral.ttlfc.model.Trick;
 import com.spectral.ttlfc.service.CardGame;
 import com.spectral.ttlfc.service.impl.CardGameImpl;
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -64,7 +61,7 @@ public class CardGameTest {
 				c.getAttributes().put("testAttr", (double)i++);
 			}
 		}
-		TrickResult tr =  g.executeTrick(playerToPlay,"testAttr" );
+		Trick tr =  g.executeTrick(playerToPlay,"testAttr" );
 		System.out.println(tr);
 		for (PlayerHand phzz : g.getPlayers()) {
 			if ( phzz.getPlayer().getEmail().equals("alex@alex.com")) {

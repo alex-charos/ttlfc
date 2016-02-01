@@ -20,10 +20,11 @@ import com.spectral.ttlfc.utils.TrickOutcome;
 public class CardGameImpl extends CardGame {
 	
 	Logger logger = Logger.getLogger(getClass());
-	
+	private int trickCount = 0;
 	private GameStatus status;
 	private Deque<PlayerHand> players;
 	private Deque<Card> cardsOnHold;
+	private Deque<Trick> trickHistory;
 
 	public CardGameImpl(Deque<Player> players) {
 		super(players);
@@ -38,7 +39,7 @@ public class CardGameImpl extends CardGame {
 	}
 
 
-	public TrickResult executeTrick(Player p, String attribute) throws NotYourTurnException {
+	public Trick executeTrick(Player p, String attribute) throws NotYourTurnException {
 		if (!p.equals(getPlayerTurn())) {
 			throw new NotYourTurnException();
 		}
@@ -50,10 +51,11 @@ public class CardGameImpl extends CardGame {
 		removeLosers();
 		
 		TrickResult tr = getTrickResult(winner);
-		
+		t.setResult(tr);
+		getTrickHistory().add(t);
 		PlayerHand next = getPlayers().remove();
 		getPlayers().add(next);
-		return tr;
+		return t;
 	}
 	
 	public Player getPlayerTurn() {
@@ -96,6 +98,7 @@ public class CardGameImpl extends CardGame {
 	
 	private Trick setupTrick(String attribute) {
 		Trick t = new Trick();
+		t.setId(trickCount++);
 		t.setAttribute(attribute);
 		for (PlayerHand ph : getPlayers()) {
 			CardFaceOff cfo = new CardFaceOff();
@@ -206,6 +209,14 @@ public class CardGameImpl extends CardGame {
 
 	public void setCardsOnHold(Deque<Card> cardsOnHold) {
 		this.cardsOnHold = cardsOnHold;
+	}
+
+	@Override
+	public Deque<Trick> getTrickHistory() {
+		if (trickHistory==null) {
+			trickHistory = new LinkedList<Trick>();
+		}
+		return trickHistory;
 	}
 	
 
