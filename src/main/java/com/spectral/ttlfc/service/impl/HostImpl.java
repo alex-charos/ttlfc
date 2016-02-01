@@ -28,7 +28,7 @@ public class HostImpl implements Host {
 	public PlayerEntryResponse acceptPlayer(Player p) {
 		p.setUuid(UUID.randomUUID());
 		PlayerEntryResponse per = new PlayerEntryResponse();
-		per.setToken(p.getUuid());
+		per.setPlayerToken(p.getUuid());
 		if (lobbyImpl.getWaitingRoom().isEmpty()) {
 			per.setResponse(PlayerResponseType.inWaitingRoom);
 			lobbyImpl.addPlayerInWaitingRoom(p);
@@ -40,7 +40,8 @@ public class HostImpl implements Host {
 			players.add(p);
 			CardGame cg =  GameFactory.getGame(gameType, players);
 			
-			lobbyImpl.createCardGame(cg);
+			UUID gameId = lobbyImpl.createCardGame(cg);
+			per.setGameToken(gameId);
 			per.setResponse(PlayerResponseType.enteredGame);
 		}
 		return per;
@@ -50,13 +51,13 @@ public class HostImpl implements Host {
 		PlayerEntryResponse per = new PlayerEntryResponse();
 		if (lobbyImpl.getWaitingRoom().keySet().contains(playerUUID)) {
 			per.setResponse(PlayerResponseType.inWaitingRoom);
-			per.setToken(playerUUID);
+			per.setPlayerToken(playerUUID);
 		} else {
 			for (UUID uuid : lobbyImpl.getCardGames().keySet()) {
 				for ( PlayerHand pPlaying :lobbyImpl.getCardGames().get(uuid).getPlayers()) {
 					if (pPlaying.getPlayer().getUuid().equals(playerUUID)) {
 						per.setResponse(PlayerResponseType.enteredGame);
-						per.setToken(uuid);
+						per.setGameToken(uuid);
 					}
 				}
 			}

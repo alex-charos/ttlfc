@@ -9,14 +9,23 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
+import com.spectral.ttlfc.TopTrumps;
 import com.spectral.ttlfc.model.Card;
 import com.spectral.ttlfc.model.Player;
 import com.spectral.ttlfc.model.PlayerHand;
 import com.spectral.ttlfc.model.TrickResult;
 import com.spectral.ttlfc.service.CardGame;
 import com.spectral.ttlfc.service.impl.CardGameImpl;
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(TopTrumps.class)
+@WebAppConfiguration
+@EnableAutoConfiguration
 public class CardGameTest {
 	
 	@Test
