@@ -1,4 +1,4 @@
-package com.spectral.ttlfc;
+package com.spectral.ttlfc.test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
