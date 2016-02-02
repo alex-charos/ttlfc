@@ -4,3 +4,6 @@ The players are retrieved via the REST API given by the lovely fellas of http://
 
 This project will act as the back-end offering a REST API for playing trump cardds.
 install with `mvn install`
+
+Currently deployed on heroku at https://ttlfc.herokuapp.com 
+
