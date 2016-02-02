@@ -6,4 +6,5 @@ This project will act as the back-end offering a REST API for playing trump card
 install with `mvn install`
 
 Currently deployed on heroku at https://ttlfc.herokuapp.com 
+Swagger URL: https://ttlfc.herokuapp.com/v2/api-docs 
 
