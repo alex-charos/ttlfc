@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +34,7 @@ public class GameController {
 	public String index() {
 		return "Welcome to the Top Trumps app!";
 	}
-	
+	@CrossOrigin
 	@RequestMapping(method=RequestMethod.POST, value="enter-lobby")
 	public PlayerEntryResponse playerEntry(@RequestBody Player p) {
 		
