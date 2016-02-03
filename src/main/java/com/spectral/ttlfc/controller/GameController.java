@@ -22,6 +22,7 @@ import com.spectral.ttlfc.service.Lobby;
 
 @RestController
 @RequestMapping("/tt")
+@CrossOrigin
 public class GameController {
 	@Autowired
 	Host hostImpl;
@@ -34,7 +35,7 @@ public class GameController {
 	public String index() {
 		return "Welcome to the Top Trumps app!";
 	}
-	@CrossOrigin
+	
 	@RequestMapping(method=RequestMethod.POST, value="enter-lobby")
 	public PlayerEntryResponse playerEntry(@RequestBody Player p) {
 		
