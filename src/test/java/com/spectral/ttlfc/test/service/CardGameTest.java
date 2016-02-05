@@ -13,12 +13,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.spectral.ttlfc.TopTrumps;
+import com.spectral.ttlfc.factory.GameFactory;
 import com.spectral.ttlfc.model.Card;
 import com.spectral.ttlfc.model.Player;
 import com.spectral.ttlfc.model.PlayerHand;
 import com.spectral.ttlfc.model.Trick;
 import com.spectral.ttlfc.service.CardGame;
 import com.spectral.ttlfc.service.impl.CardGameImpl;
+import com.spectral.ttlfc.utils.CardGameType;
+import com.spectral.ttlfc.utils.GameStatus;
+import com.spectral.ttlfc.utils.TrickOutcome;
+
+import junit.extensions.TestDecorator;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(TopTrumps.class)
 @WebAppConfiguration
@@ -27,13 +33,19 @@ public class CardGameTest {
 	
 	@Test
 	public void testDealEqualCards() {
-		CardGame game = getCardGame();
+		CardGame game = getCardGame(getDeck(10));
 		
 		assertEquals(5, game.getPlayers().pop().getCards().size());
 		assertEquals(5, game.getPlayers().pop().getCards().size());
 	}
 	
-	
+	@Test
+	public void testDraw(){
+		CardGame game = getCardGame(getEqualDeck(10));
+		
+		Trick t = game.executeTrick(game.getPlayerTurn(), "attr 1");
+		assertEquals(TrickOutcome.roundDraw, t.getResult().getOutcome());
+	}
 	@Test
 	public void testDealNotEqualCardsDealerFirst() {
 		testDealCorrect(0);
@@ -44,7 +56,7 @@ public class CardGameTest {
 	}
 	@Test
 	public void testGame() {
-		CardGame g = getCardGame();
+		CardGame g = getCardGame(getDeck(10));
 		Player playerToPlay = null;
 		for (PlayerHand ph : g.getPlayers()) {
 			int i =0;
@@ -76,10 +88,10 @@ public class CardGameTest {
 		
 	}
 	
-	private CardGame getCardGame() {
+	private CardGame getCardGame(Deque<Card> deck) {
 		Deque<Player> players = getTwoPlayers();
-		CardGame game = new CardGameImpl(players);
-		game.dealDeck(getDeck(10));
+		CardGame game = GameFactory.getGame(CardGameType.standardCardGame, players);
+		game.dealDeck(deck);
 		
 		return game;
 	}
@@ -136,6 +148,22 @@ public class CardGameTest {
 			c.setName("Card " + i);
 			for (int j=0; j < 4; j++) {
 				c.getAttributes().put("attr " +j ,1 + (double)(Math.random() * 100) );
+			}
+			deck.add(c);
+		}
+		
+		return deck;
+		
+	}
+	private Deque<Card> getEqualDeck(int deckSize){
+		
+		Deque<Card> deck = new LinkedList<Card>();
+		
+		for (int i=0; i< deckSize; i++) {
+			Card c = new Card();
+			c.setName("Card " + i);
+			for (int j=0; j < 4; j++) {
+				c.getAttributes().put("attr " +j ,2.0);
 			}
 			deck.add(c);
 		}

@@ -134,7 +134,7 @@ public class CardGameImpl extends CardGame {
 		Double winningValue = null;
 		for (CardFaceOff cfo :t.getCards()) {
 			Double currentValue = cfo.getCard().getAttributes().get(t.getAttribute());
-			if (winningValue != null && currentValue == winningValue) {
+			if (currentValue!= null  && currentValue.equals(winningValue)) {
 				System.out.println("Equal value, nobody wins");
 				winner = null;
 			}
