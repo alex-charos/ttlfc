@@ -1,5 +1,6 @@
 package com.spectral.ttlfc.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -41,11 +42,12 @@ public class GameController {
 		
 		return hostImpl.acceptPlayer(p);
 	}
-	@RequestMapping(method=RequestMethod.GET, value="my-update/{uuid}")
+	
+	@RequestMapping(method=RequestMethod.GET, value="my-lobby-status/{uuid}")
 	public PlayerEntryResponse getPlayerUpdate(@PathVariable UUID  uuid) {
-		
 		return hostImpl.getPlayerStatus(uuid);
 	}
+	
 	@RequestMapping(method=RequestMethod.GET, value="game/turn/{gameId}")
 	public Map<String, Object> getPlayerTurnAndTrickHistory(@PathVariable UUID  gameId) {
 		CardGame game = lobbyImpl.getCardGames().get(gameId);
@@ -55,7 +57,6 @@ public class GameController {
 		return ret;
 	}
 	
-	 
 	@RequestMapping(method=RequestMethod.POST ,value="/game/{gameId}/trick/attribute/{attribute}")
 	public Trick trick(@PathVariable UUID gameId, @PathVariable String attribute, @RequestBody Player player) {
 		CardGame game = lobbyImpl.getCardGames().get(gameId);
@@ -75,5 +76,11 @@ public class GameController {
 		}
 		return phRet;
 	}
+	
+	@RequestMapping(method=RequestMethod.GET,value="/heartbeat/player/{playerUUID}")
+	public Date heartbeat( @PathVariable UUID playerUUID) {
+		return hostImpl.playerHeartbeat(playerUUID);
+	}
+	 
 	 
 }
