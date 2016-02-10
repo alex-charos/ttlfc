@@ -2,7 +2,6 @@ package com.spectral.ttlfc.model;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.UUID;
 
 public class PlayerHand {
 	
@@ -10,7 +9,6 @@ public class PlayerHand {
 	private Player player;
 	private Deque<Card> cards;
 	private boolean dealing;
-	
 	
 	public PlayerHand(Player p) {
 		this.player = p;
@@ -45,6 +43,7 @@ public class PlayerHand {
 	public String toString() {
 		return "PlayerHand [player=" + player + ", cards=" + cards + ", dealing=" + dealing + "]";
 	}
+
 
 
 
