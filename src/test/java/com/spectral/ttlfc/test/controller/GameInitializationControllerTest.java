@@ -30,7 +30,7 @@ public class GameInitializationControllerTest {
 
 	@Test
 	public void getHello() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/")
+		mvc.perform(MockMvcRequestBuilders.get("/tt/")
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(content().string(equalTo("Welcome to the Top Trumps app!")));
