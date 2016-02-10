@@ -1,5 +1,5 @@
 # Top Trumps
-[![Build Status](https://travis-ci.org/alex-charos/ttlfc.svg?branch=master?branch=master)](https://travis-ci.org/alex-charos/ttlfc.svg?branch=master)
+[![Build Status](https://travis-ci.org/alex-charos/ttlfc.svg?branch=master?branch=master)](https://travis-ci.org/alex-charos/ttlfc.svg)
 
 A Top Trumps game for football lovers.
 
