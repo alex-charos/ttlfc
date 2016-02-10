@@ -16,7 +16,7 @@ public class LobbyImpl implements Lobby {
 	private Map<UUID, CardGame> cardGames;
 
 	public UUID addPlayerInWaitingRoom(Player player) {
-		 getWaitingRoom().put(player.getUuid(), player);
+		getWaitingRoom().put(player.getUuid(), player);
 		return player.getUuid();
 	}
 
