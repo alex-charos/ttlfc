@@ -1,6 +1,5 @@
 # Top Trumps
-[![Build Status](https://travis-ci.org/alex-charos/ttlfc.svg?branch=master?branch=master)](https://travis-ci.org/alex-charos/ttlfc.svg)
-
+![Build status](https://api.travis-ci.org/alex-charos/ttlfc.svg?branch=master)
 A Top Trumps game for football lovers.
 
 The players are retrieved via the REST API given by the lovely fellas of http://www.football-data.org
