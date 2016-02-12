@@ -22,7 +22,7 @@ public class CardGameImpl extends CardGame {
 	Logger logger = Logger.getLogger(getClass());
 	private int trickCount = 0;
 	private GameStatus status;
-	private Deque<PlayerHand> players;
+
 	private Deque<Card> cardsOnHold;
 	private Deque<Trick> trickHistory;
 
@@ -186,18 +186,6 @@ public class CardGameImpl extends CardGame {
 		return players;
 	}
 	
-	public Deque<PlayerHand> getPlayers() {
-		if (players == null) {
-			players = new LinkedList<PlayerHand>();
-		}
-		return players;
-	}
-	public void setPlayers(Deque<PlayerHand> players) {
-		this.players = players;
-	}
-
-
-
 	public Deque<Card> getCardsOnHold() {
 		if (cardsOnHold==null) {
 			cardsOnHold = new LinkedList<Card>();

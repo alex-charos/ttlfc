@@ -1,10 +1,19 @@
 package com.spectral.ttlfc.service.impl;
 
+import java.util.Date;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.spectral.ttlfc.factory.GameFactory;
@@ -21,11 +30,18 @@ import com.spectral.ttlfc.utils.PlayerResponseType;
 
 @Component(value="hostImpl")
 public class HostImpl implements Host {
+	Logger logger = Logger.getLogger(getClass());
+	
 	@Autowired
 	Lobby lobbyImpl;
 	
 	@Autowired
 	CardService footballPlayerCardService;
+	
+	Map<UUID, Long> playerHeartbeats;
+	
+    @Value("${host.allowedInactiveTimeInSeconds}")
+    private int allowedInactiveTimeInSeconds;
 
 	
 	private CardGameType gameType = CardGameType.standardCardGame;
@@ -50,6 +66,7 @@ public class HostImpl implements Host {
 			per.setGameToken(gameId);
 			per.setResponse(PlayerResponseType.enteredGame);
 		}
+		playerHeartbeat(p.getUuid());
 		return per;
 	}
 
@@ -70,5 +87,56 @@ public class HostImpl implements Host {
 		}
 		return per;
 	}
+	@Scheduled(fixedRate=10000)
+	public void checkPlayersPresence() {
+		logger.info("Checking player presence...");
+		DateTime now = new DateTime();
+		Set<UUID> playersToRemoveHBs = new HashSet<UUID>();
+		for (UUID playerId : getPlayerHeartbeats().keySet()) {
+			if (now.minusSeconds(getAllowedInactiveTimeInSeconds()).isAfter(new DateTime(getPlayerHeartbeats().get(playerId)))) {
+				logger.warn("Player :" + playerId + " hasn't checked for over a minute. Removing from lobby...");
+				removePlayerFromLobby(playerId);
+				playersToRemoveHBs.add(playerId);
+			}
+		}
+		for (UUID uuid : playersToRemoveHBs) {
+			getPlayerHeartbeats().remove(uuid);
+		}
+		
+	}
+	
+	private void removePlayerFromLobby(UUID playerId){
+		for (CardGame cg : lobbyImpl.getCardGames().values()) {
+			for (PlayerHand ph : cg.getPlayers()) {
+				if (ph.getPlayer().getUuid().equals(playerId)) {
+					cg.getPlayers().remove(ph);
+				}
+				 
+			}
+		}
+		lobbyImpl.getWaitingRoom().remove(playerId);
+		
+	}
+	public Date playerHeartbeat(UUID playerId) {
+		Date d = new Date();
+		getPlayerHeartbeats().put(playerId, d.getTime());
+		return d;
+	}
+	private Map<UUID, Long> getPlayerHeartbeats() {
+		if (playerHeartbeats == null) {
+			playerHeartbeats = new HashMap<UUID, Long>();
+		}
+		return playerHeartbeats;
+	}
+
+	public int getAllowedInactiveTimeInSeconds() {
+		return allowedInactiveTimeInSeconds;
+	}
+
+	public void setAllowedInactiveTimeInSeconds(int allowedInactiveTimeInSeconds) {
+		this.allowedInactiveTimeInSeconds = allowedInactiveTimeInSeconds;
+	}
+
+	 
 
 }
