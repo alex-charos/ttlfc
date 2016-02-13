@@ -89,5 +89,6 @@ public class HostTestPlayerRemoval {
 		
 		hostImpl.checkPlayersPresence();
 		assertEquals(0, lobbyImpl.getCardGames().get(per.getGameToken()).getPlayers().size());
+		
 	} 
 }
