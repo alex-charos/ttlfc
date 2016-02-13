@@ -1,5 +1,6 @@
 package com.spectral.ttlfc.service.impl;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -7,6 +8,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonArray;
@@ -20,11 +22,17 @@ import com.spectral.ttlfc.utils.HTTPUtil;
 @Component("footballCardService")
 public class FootballPlayerCardService implements CardService{
 	
-	private String apiUrl ="http://api.football-data.org/v1/soccerseasons";
-	private String apiToken = "79e23fafd923491b91572cde3c9d41e3";
-	private SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
-	JsonParser parser = new JsonParser();
-	public Deque<Card> generateCards(Integer totals) {
+    @Value("${footballservice.api.url}")
+    private String apiUrl;
+	
+    @Value("${footballservice.api.token}")
+    private String apiToken;
+	
+    private SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+	
+    JsonParser parser = new JsonParser();
+	
+    public Deque<Card> generateCards(Integer totals) {
 		
 		Deque<Card> cards = new LinkedList<Card>();
 		try {
@@ -52,26 +60,8 @@ public class FootballPlayerCardService implements CardService{
 					for (JsonElement jsePlayer : players) {
 						try {
 					
-							JsonObject jsoPlayer = jsePlayer.getAsJsonObject();
-							String pName = jsoPlayer.get("name").getAsString();
-							Integer jerseyNumber = jsoPlayer.get("jerseyNumber").getAsInt();
-							String marketValue = jsoPlayer.get("marketValue").getAsString();
-							marketValue = marketValue.substring(0, marketValue.indexOf(" ")).replace(",", "");
-							Double mktVal = Double.parseDouble(marketValue);
-							
-							String dobStr = jsoPlayer.get("dateOfBirth").getAsString();
-							Date d =sdf.parse(dobStr);
-							Date dNow = new Date();
-							
-							long diffInYears = ((((dNow.getTime() - d.getTime())/1000)/3600)/24)/365;
-							  
-							Card c = new Card();
-							c.setName(pName);
+							Card c = parsePlayerAsCard(jsePlayer);
 							c.setImageUrl(logo);
-							c.getAttributes().put("jerseyNumber", jerseyNumber.doubleValue());
-							c.getAttributes().put("marketValue", mktVal);
-							c.getAttributes().put("ageInYears", (double)diffInYears);
-							
 							cards.add(c);
 							if (totals!=null && cards.size() >= totals) {
 								return cards;
@@ -91,6 +81,29 @@ public class FootballPlayerCardService implements CardService{
 		}
 		return cards;
 	}
+    private Card  parsePlayerAsCard(JsonElement jsePlayer) throws ParseException {
+    	JsonObject jsoPlayer = jsePlayer.getAsJsonObject();
+		String pName = jsoPlayer.get("name").getAsString();
+		Integer jerseyNumber = jsoPlayer.get("jerseyNumber").getAsInt();
+		String marketValue = jsoPlayer.get("marketValue").getAsString();
+		marketValue = marketValue.substring(0, marketValue.indexOf(" ")).replace(",", "");
+		Double mktVal = Double.parseDouble(marketValue);
+		
+		String dobStr = jsoPlayer.get("dateOfBirth").getAsString();
+		Date d =sdf.parse(dobStr);
+		Date dNow = new Date();
+		
+		long diffInYears = ((((dNow.getTime() - d.getTime())/1000)/3600)/24)/365;
+		  
+		Card c = new Card();
+		c.setName(pName);
+		
+		c.getAttributes().put("jerseyNumber", jerseyNumber.doubleValue());
+		c.getAttributes().put("marketValue", mktVal);
+		c.getAttributes().put("ageInYears", (double)diffInYears);
+		return c;
+    	
+    }
 	
 	private Deque<Card> shuffleCards(LinkedList<Card> cards){
 		 Collections.shuffle(cards);
