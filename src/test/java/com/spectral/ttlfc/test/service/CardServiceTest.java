@@ -1,21 +1,31 @@
 package com.spectral.ttlfc.test.service;
 
-import static org.junit.Assert.*;
-
-import java.util.Set;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
-import com.spectral.ttlfc.model.Card;
+import com.spectral.ttlfc.TopTrumps;
 import com.spectral.ttlfc.service.CardService;
-import com.spectral.ttlfc.service.impl.FootballPlayerCardService;
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(TopTrumps.class)
+@WebAppConfiguration
+@EnableAutoConfiguration
 public class CardServiceTest {
+	
+	@Autowired
+	CardService cardService;
+	
 	
 	@Test
 	public void testGetCards(){
-		CardService cs = new FootballPlayerCardService();
-		assertEquals(10, cs.generateCards(10).size());
+		
+		assertEquals(10, cardService.generateCards(10).size());
 	}
 
 }
