@@ -20,5 +20,14 @@ public class TestUtils {
 		
 		return perReq;
 	}
+	public static PlayerEntryRequest getJoinTableTwoPlayers(Table t ) {
+		Player p2 = new Player();
+		p2.setEmail("next@test.gr");
+		PlayerEntryRequest perReq2 = new PlayerEntryRequest();
+		perReq2.setPlayer(p2);
+		perReq2.setRequestType(EntryRequestType.joinTable);
+		perReq2.setRequestTable(t);
+		return perReq2;
+	}
 
 }

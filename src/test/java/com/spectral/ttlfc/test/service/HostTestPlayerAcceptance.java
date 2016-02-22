@@ -46,27 +46,14 @@ public class HostTestPlayerAcceptance {
 	
 	@Test
 	public void testAcceptPlayersInEmptyRoom(){
-		Player p = new Player();
-		p.setEmail("real@test.gr");
-		Table t = new Table();
-		t.setPlayersRequired(2);
-		
-		PlayerEntryRequest perReq = new PlayerEntryRequest();
-		perReq.setPlayer(p);
-		perReq.setRequestTable(t);
-		perReq.setRequestType(EntryRequestType.createTable);
+		PlayerEntryRequest perReq = TestUtils.getCreateTableTwoPlayers();
 		PlayerEntryResponse per = hostImpl.acceptPlayer(perReq);
 		assertNotNull(per);
 		assertEquals(PlayerResponseType.inWaitingRoom, per.getResponse());
 		assertEquals(1, lobbyImpl.getWaitingTables().size());
 		assertEquals(1, lobbyImpl.getWaitingTables().values().iterator().next().getPlayersWaiting().size());
 		
-		Player p2 = new Player();
-		p.setEmail("next@test.gr");
-		PlayerEntryRequest perReq2 = new PlayerEntryRequest();
-		perReq2.setPlayer(p2);
-		perReq2.setRequestType(EntryRequestType.joinTable);
-		perReq2.setRequestTable(t);
+		PlayerEntryRequest perReq2 =TestUtils.getJoinTableTwoPlayers(perReq.getRequestTable());
 		PlayerEntryResponse per2 = hostImpl.acceptPlayer(perReq2);
 		assertNotNull(per2);
 		assertEquals(PlayerResponseType.enteredGame, per2.getResponse());
