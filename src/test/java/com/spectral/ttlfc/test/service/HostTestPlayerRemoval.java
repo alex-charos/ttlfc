@@ -21,6 +21,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import com.spectral.ttlfc.TopTrumps;
 import com.spectral.ttlfc.factory.GameFactory;
 import com.spectral.ttlfc.model.Player;
+import com.spectral.ttlfc.model.PlayerEntryRequest;
 import com.spectral.ttlfc.model.PlayerEntryResponse;
 import com.spectral.ttlfc.model.PlayerHand;
 import com.spectral.ttlfc.service.CardGame;
@@ -40,55 +41,42 @@ public class HostTestPlayerRemoval {
 	
 	@Autowired
 	Lobby lobbyImpl;
+	
+	private PlayerEntryResponse startGame(){
+		PlayerEntryRequest per = TestUtils.getCreateTableTwoPlayers();
+		hostImpl.acceptPlayer(per);
+		return hostImpl.acceptPlayer(TestUtils.getJoinTableTwoPlayers(per.getRequestTable()));
+		
+	}
  
-//	@Test
-//	public void testActivePlayerNotRemovedFromGames() {
-//		Deque<Player> plz = new LinkedList<Player>();
-//		
-//		Player p1 = new Player();
-//		p1.setUuid(UUID.randomUUID());
-//		plz.add(p1);
-//		
-//		Player p2 = new Player();
-//		p2.setUuid(UUID.randomUUID());
-//		plz.add(p2);
-//		
-//		CardGame cg = GameFactory.getGame(CardGameType.standardCardGame	, plz);
-//		hostImpl.acceptPlayer(p1);
-//		hostImpl.acceptPlayer(p2);
-////		hostImpl.playerHeartbeat(p1.getUuid());
-////		hostImpl.playerHeartbeat(p2.getUuid());	
-//		UUID uuid = UUID.randomUUID();
-//		
-//		lobbyImpl.getCardGames().put(uuid, cg);
-//		
-//		hostImpl.checkPlayersPresence();
-//		assertEquals(2, lobbyImpl.getCardGames().get(uuid).getPlayers().size());
-//	} 
-//	@Test
-//	public void testInactivePlayerRemovedFromGames() {
-//		Deque<Player> plz = new LinkedList<Player>();
-//		
-//		Player p1 = new Player();
-//		p1.setUuid(UUID.randomUUID());
-//		plz.add(p1);
-//		
-//		Player p2 = new Player();
-//		p2.setUuid(UUID.randomUUID());
-//		plz.add(p2);
-//		hostImpl.acceptPlayer(p1);
-//		PlayerEntryResponse per= hostImpl.acceptPlayer(p2);
-//		assertEquals(PlayerResponseType.enteredGame, per.getResponse());
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//		
-//		hostImpl.checkPlayersPresence();
-//		assertEquals(0, lobbyImpl.getCardGames().get(per.getGameToken()).getPlayers().size());
-//		
-//	} 
+	@Test
+	public void testActivePlayerNotRemovedFromGames() {
+		PlayerEntryResponse pes =  startGame();
+		hostImpl.checkPlayersPresence();
+		assertEquals(2, lobbyImpl.getCardGames().get(pes.getGameToken()).getPlayers().size());
+	} 
+	@Test
+	public void testInactivePlayerRemovedFromGames() {
+		Deque<Player> plz = new LinkedList<Player>();
+		
+		Player p1 = new Player();
+		p1.setUuid(UUID.randomUUID());
+		plz.add(p1);
+		
+		Player p2 = new Player();
+		p2.setUuid(UUID.randomUUID());
+		plz.add(p2);
+		hostImpl.acceptPlayer(TestUtils.getCreateTableTwoPlayers());
+		PlayerEntryResponse per= hostImpl.acceptPlayer(TestUtils.getCreateTableTwoPlayers());
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		hostImpl.checkPlayersPresence();
+		assertEquals(0, lobbyImpl.getWaitingTables().size());
+	} 
 }

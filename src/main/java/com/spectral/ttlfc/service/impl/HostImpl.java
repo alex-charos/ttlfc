@@ -114,7 +114,7 @@ public class HostImpl implements Host {
 		Set<UUID> playersToRemoveHBs = new HashSet<UUID>();
 		for (UUID playerId : getPlayerHeartbeats().keySet()) {
 			if (now.minusSeconds(getAllowedInactiveTimeInSeconds()).isAfter(new DateTime(getPlayerHeartbeats().get(playerId)))) {
-				logger.warn("Player :" + playerId + " hasn't checked for over a minute. Removing from lobby...");
+				logger.warn("Player :" + playerId + " hasn't checked for over " + getAllowedInactiveTimeInSeconds() + " seconds. Removing from lobby...");
 				removePlayerFromLobby(playerId);
 				playersToRemoveHBs.add(playerId);
 			}
@@ -134,6 +134,7 @@ public class HostImpl implements Host {
 				 
 			}
 		}
+		Set<UUID> tablesToRemove = new HashSet<UUID>();
 		for (Table t : lobbyImpl.getWaitingTables().values()) {
 			for (Player p : t.getPlayersWaiting()) {
 				if (p.getUuid().equals(playerId)) {
@@ -141,13 +142,20 @@ public class HostImpl implements Host {
 					break;
 				}
 			}
+			if (t.getPlayersWaiting().size()==0) {
+				tablesToRemove.add(t.getId());
+			}
 		}
+		for (UUID idToRemove : tablesToRemove) {
+			lobbyImpl.getWaitingTables().remove(idToRemove);
+		}
+		
 		
 		
 	}
 	public Date playerHeartbeat(UUID playerId) {
 		Date d = new Date();
-		getPlayerHeartbeats().put(playerId, d.getTime());
+		getPlayerHeartbeats().put(playerId, (Long)d.getTime());
 		return d;
 	}
 	private Map<UUID, Long> getPlayerHeartbeats() {
