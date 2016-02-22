@@ -14,6 +14,5 @@ public interface Host {
 	PlayerEntryResponse getPlayerStatus(UUID playerUUID);
 	void checkPlayersPresence();
 	Date playerHeartbeat(UUID playerId);
-	UUID sitToTable(Table t,Player player);
-	Table openTable(Player p);
+
 }

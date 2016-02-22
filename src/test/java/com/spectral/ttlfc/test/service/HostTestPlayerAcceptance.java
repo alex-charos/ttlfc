@@ -21,12 +21,15 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import com.spectral.ttlfc.TopTrumps;
 import com.spectral.ttlfc.factory.GameFactory;
 import com.spectral.ttlfc.model.Player;
+import com.spectral.ttlfc.model.PlayerEntryRequest;
 import com.spectral.ttlfc.model.PlayerEntryResponse;
 import com.spectral.ttlfc.model.PlayerHand;
+import com.spectral.ttlfc.model.Table;
 import com.spectral.ttlfc.service.CardGame;
 import com.spectral.ttlfc.service.Host;
 import com.spectral.ttlfc.service.Lobby;
 import com.spectral.ttlfc.utils.CardGameType;
+import com.spectral.ttlfc.utils.EntryRequestType;
 import com.spectral.ttlfc.utils.PlayerResponseType;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,18 +48,29 @@ public class HostTestPlayerAcceptance {
 	public void testAcceptPlayersInEmptyRoom(){
 		Player p = new Player();
 		p.setEmail("real@test.gr");
-		PlayerEntryResponse per = hostImpl.acceptPlayer(p);
+		Table t = new Table();
+		t.setPlayersRequired(2);
+		
+		PlayerEntryRequest perReq = new PlayerEntryRequest();
+		perReq.setPlayer(p);
+		perReq.setRequestTable(t);
+		perReq.setRequestType(EntryRequestType.createTable);
+		PlayerEntryResponse per = hostImpl.acceptPlayer(perReq);
 		assertNotNull(per);
 		assertEquals(PlayerResponseType.inWaitingRoom, per.getResponse());
-		assertEquals(1, lobbyImpl.getWaitingRoom().size());
+		assertEquals(1, lobbyImpl.getWaitingTables().size());
+		assertEquals(1, lobbyImpl.getWaitingTables().values().iterator().next().getPlayersWaiting().size());
 		
 		Player p2 = new Player();
 		p.setEmail("next@test.gr");
-		PlayerEntryResponse per2 = hostImpl.acceptPlayer(p2);
+		PlayerEntryRequest perReq2 = new PlayerEntryRequest();
+		perReq2.setPlayer(p2);
+		perReq2.setRequestType(EntryRequestType.joinTable);
+		perReq2.setRequestTable(t);
+		PlayerEntryResponse per2 = hostImpl.acceptPlayer(perReq2);
 		assertNotNull(per2);
 		assertEquals(PlayerResponseType.enteredGame, per2.getResponse());
-		assertEquals(0, lobbyImpl.getWaitingRoom().size());
-		
+		assertEquals(0, lobbyImpl.getWaitingTables().size());
 		assertEquals(1, lobbyImpl.getCardGames().size());
 		
 	}

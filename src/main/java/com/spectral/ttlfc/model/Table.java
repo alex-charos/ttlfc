@@ -1,6 +1,7 @@
 package com.spectral.ttlfc.model;
 
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.UUID;
 
 public class Table {
@@ -22,6 +23,9 @@ public class Table {
 		this.playersRequired = playersRequired;
 	}
 	public Deque<Player> getPlayersWaiting() {
+		if (playersWaiting == null) {
+			playersWaiting = new LinkedList<Player>();
+		}
 		return playersWaiting;
 	}
 	public void setPlayersWaiting(Deque<Player> playersWaiting) {

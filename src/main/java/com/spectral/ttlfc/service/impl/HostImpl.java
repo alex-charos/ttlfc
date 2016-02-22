@@ -55,33 +55,29 @@ public class HostImpl implements Host {
 		p.setUuid(UUID.randomUUID());
 		PlayerEntryResponse per = new PlayerEntryResponse();
 		per.setPlayerToken(p.getUuid());
-		
+		per.setResponse(PlayerResponseType.inWaitingRoom);
 		EntryRequestType ert = peReq.getRequestType();
 		if (ert.equals(EntryRequestType.createTable)) {
 			Table t = peReq.getRequestTable();
 			t.setId(UUID.randomUUID());
+			t.getPlayersWaiting().add(p);
+			lobbyImpl.getWaitingTables().put(t.getId(), t);
 			
 			
 		} else if (ert.equals(EntryRequestType.joinTable)) {
-			
-		}
-		
-		
-		if (lobbyImpl.getWaitingRoom().isEmpty()) {
-			per.setResponse(PlayerResponseType.inWaitingRoom);
-			lobbyImpl.addPlayerInWaitingRoom(p);
-		} else {
-			UUID playerUUIDToMatch = lobbyImpl.getWaitingRoom().keySet().iterator().next();
-			Player playerToMatch = lobbyImpl.getWaitingRoom().remove(playerUUIDToMatch);
-			Deque<Player> players = new LinkedList<Player>();
-			players.add(playerToMatch);
-			players.add(p);
-			CardGame cg =  GameFactory.getGame(gameType, players);
-			cg.dealDeck(footballPlayerCardService.generateCards(10));
+			Table t =lobbyImpl.getWaitingTables().get(peReq.getRequestTable().getId());
+			t.getPlayersWaiting().add(peReq.getPlayer());
+			if (t.getPlayersWaiting().size() >= t.getPlayersRequired()) {
+				lobbyImpl.getWaitingTables().remove(t.getId());
+				CardGame cg =  GameFactory.getGame(gameType, t.getPlayersWaiting());
+				cg.dealDeck(footballPlayerCardService.generateCards(10));
 
-			UUID gameId = lobbyImpl.createCardGame(cg);
-			per.setGameToken(gameId);
-			per.setResponse(PlayerResponseType.enteredGame);
+				UUID gameId = lobbyImpl.createCardGame(cg);
+				per.setGameToken(gameId);
+				per.setResponse(PlayerResponseType.enteredGame);
+
+				
+			}
 		}
 		playerHeartbeat(p.getUuid());
 		return per;
@@ -90,9 +86,16 @@ public class HostImpl implements Host {
 	public PlayerEntryResponse getPlayerStatus(UUID playerUUID) {
 		PlayerEntryResponse per = new PlayerEntryResponse();
 		per.setPlayerToken(playerUUID);
-		if (lobbyImpl.getWaitingRoom().keySet().contains(playerUUID)) {
-			per.setResponse(PlayerResponseType.inWaitingRoom);
-		} else {
+		boolean playerInWaitingRoom = false;
+		for (Table t : lobbyImpl.getWaitingTables().values()) {
+			for (Player p : t.getPlayersWaiting()) {
+				if (p.getUuid().equals(playerUUID)) {
+					per.setResponse(PlayerResponseType.inWaitingRoom);
+					playerInWaitingRoom = true;
+				}
+			}
+		}
+		if (!playerInWaitingRoom) {
 			for (UUID uuid : lobbyImpl.getCardGames().keySet()) {
 				for ( PlayerHand pPlaying :lobbyImpl.getCardGames().get(uuid).getPlayers()) {
 					if (pPlaying.getPlayer().getUuid().equals(playerUUID)) {
@@ -131,7 +134,15 @@ public class HostImpl implements Host {
 				 
 			}
 		}
-		lobbyImpl.getWaitingRoom().remove(playerId);
+		for (Table t : lobbyImpl.getWaitingTables().values()) {
+			for (Player p : t.getPlayersWaiting()) {
+				if (p.getUuid().equals(playerId)) {
+					t.getPlayersWaiting().remove(p);
+					break;
+				}
+			}
+		}
+		
 		
 	}
 	public Date playerHeartbeat(UUID playerId) {
@@ -154,6 +165,6 @@ public class HostImpl implements Host {
 		this.allowedInactiveTimeInSeconds = allowedInactiveTimeInSeconds;
 	}
 
-	 
+
 
 }

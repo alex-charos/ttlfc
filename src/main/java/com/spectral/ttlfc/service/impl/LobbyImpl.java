@@ -12,16 +12,10 @@ import com.spectral.ttlfc.service.Lobby;
 
 @Component(value="lobbyImpl")
 public class LobbyImpl implements Lobby {
-	private Map<UUID, Table> waitingRoom;
+	private Map<UUID, Table> waitingTables;
 	private Map<UUID, CardGame> cardGames;
 
-	public Map<UUID, Table> getWaitingRoom() {
-		if (waitingRoom == null) {
-			waitingRoom = new ConcurrentHashMap<UUID, Table>();
-		} 
-		return waitingRoom;
-	}
-
+	 
 	public UUID createCardGame(CardGame game) {
 		UUID gameId = UUID.randomUUID();
 		getCardGames().put(gameId, game);
@@ -38,8 +32,12 @@ public class LobbyImpl implements Lobby {
 	 
 
 	public Map<UUID, Table> getWaitingTables() {
+		if (waitingTables == null) {
+			waitingTables = new ConcurrentHashMap<UUID, Table>();
+			
+		}
 		// TODO Auto-generated method stub
-		return null;
+		return waitingTables;
 	}
 
 }

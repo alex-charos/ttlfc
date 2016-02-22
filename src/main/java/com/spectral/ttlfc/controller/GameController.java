@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spectral.ttlfc.model.Player;
+import com.spectral.ttlfc.model.PlayerEntryRequest;
 import com.spectral.ttlfc.model.PlayerEntryResponse;
 import com.spectral.ttlfc.model.PlayerHand;
 import com.spectral.ttlfc.model.Trick;
@@ -38,9 +39,9 @@ public class GameController {
 	}
 	
 	@RequestMapping(method=RequestMethod.POST, value="enter-lobby")
-	public PlayerEntryResponse playerEntry(@RequestBody Player p) {
+	public PlayerEntryResponse playerEntry(@RequestBody PlayerEntryRequest per) {
 		
-		return hostImpl.acceptPlayer(p);
+		return hostImpl.acceptPlayer(per);
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="my-lobby-status/{uuid}")
