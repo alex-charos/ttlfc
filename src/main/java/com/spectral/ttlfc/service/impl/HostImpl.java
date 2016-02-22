@@ -18,18 +18,22 @@ import org.springframework.stereotype.Component;
 
 import com.spectral.ttlfc.factory.GameFactory;
 import com.spectral.ttlfc.model.Player;
+import com.spectral.ttlfc.model.PlayerEntryRequest;
 import com.spectral.ttlfc.model.PlayerEntryResponse;
 import com.spectral.ttlfc.model.PlayerHand;
+import com.spectral.ttlfc.model.Table;
 import com.spectral.ttlfc.service.CardGame;
 import com.spectral.ttlfc.service.CardService;
 import com.spectral.ttlfc.service.Host;
 import com.spectral.ttlfc.service.Lobby;
 import com.spectral.ttlfc.utils.CardGameType;
+import com.spectral.ttlfc.utils.EntryRequestType;
 import com.spectral.ttlfc.utils.PlayerResponseType;
 
 
 @Component(value="hostImpl")
 public class HostImpl implements Host {
+	
 	Logger logger = Logger.getLogger(getClass());
 	
 	@Autowired
@@ -46,10 +50,23 @@ public class HostImpl implements Host {
 	
 	private CardGameType gameType = CardGameType.standardCardGame;
 	
-	public PlayerEntryResponse acceptPlayer(Player p) {
+	public PlayerEntryResponse acceptPlayer(PlayerEntryRequest peReq) {
+		Player p = peReq.getPlayer();
 		p.setUuid(UUID.randomUUID());
 		PlayerEntryResponse per = new PlayerEntryResponse();
 		per.setPlayerToken(p.getUuid());
+		
+		EntryRequestType ert = peReq.getRequestType();
+		if (ert.equals(EntryRequestType.createTable)) {
+			Table t = peReq.getRequestTable();
+			t.setId(UUID.randomUUID());
+			
+			
+		} else if (ert.equals(EntryRequestType.joinTable)) {
+			
+		}
+		
+		
 		if (lobbyImpl.getWaitingRoom().isEmpty()) {
 			per.setResponse(PlayerResponseType.inWaitingRoom);
 			lobbyImpl.addPlayerInWaitingRoom(p);

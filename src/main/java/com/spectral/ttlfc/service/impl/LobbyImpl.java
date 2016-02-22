@@ -6,23 +6,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
-import com.spectral.ttlfc.model.Player;
+import com.spectral.ttlfc.model.Table;
 import com.spectral.ttlfc.service.CardGame;
 import com.spectral.ttlfc.service.Lobby;
 
 @Component(value="lobbyImpl")
 public class LobbyImpl implements Lobby {
-	private Map<UUID, Player> waitingRoom;
+	private Map<UUID, Table> waitingRoom;
 	private Map<UUID, CardGame> cardGames;
 
-	public UUID addPlayerInWaitingRoom(Player player) {
-		getWaitingRoom().put(player.getUuid(), player);
-		return player.getUuid();
-	}
-
-	public Map<UUID, Player> getWaitingRoom() {
+	public Map<UUID, Table> getWaitingRoom() {
 		if (waitingRoom == null) {
-			waitingRoom = new ConcurrentHashMap<UUID, Player>();
+			waitingRoom = new ConcurrentHashMap<UUID, Table>();
 		} 
 		return waitingRoom;
 	}
@@ -38,6 +33,13 @@ public class LobbyImpl implements Lobby {
 			cardGames = new ConcurrentHashMap<UUID, CardGame>();
 		}
 		return cardGames;
+	}
+
+	 
+
+	public Map<UUID, Table> getWaitingTables() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
