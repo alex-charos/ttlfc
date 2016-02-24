@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,6 +42,9 @@ public class HostTestPlayerRemoval {
 	
 	@Autowired
 	Lobby lobbyImpl;
+    @Value("${host.allowedInactiveTimeInSeconds}")
+    private int inactivityInSeconds;
+	
 	
 	private PlayerEntryResponse startGame(){
 		PlayerEntryRequest per = TestUtils.getCreateTableTwoPlayers();
@@ -69,7 +73,7 @@ public class HostTestPlayerRemoval {
 		hostImpl.acceptPlayer(TestUtils.getCreateTableTwoPlayers());
 		PlayerEntryResponse per= hostImpl.acceptPlayer(TestUtils.getCreateTableTwoPlayers());
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(inactivityInSeconds*1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
