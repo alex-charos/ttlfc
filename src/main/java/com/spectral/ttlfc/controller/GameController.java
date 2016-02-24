@@ -17,6 +17,7 @@ import com.spectral.ttlfc.model.Player;
 import com.spectral.ttlfc.model.PlayerEntryRequest;
 import com.spectral.ttlfc.model.PlayerEntryResponse;
 import com.spectral.ttlfc.model.PlayerHand;
+import com.spectral.ttlfc.model.Table;
 import com.spectral.ttlfc.model.Trick;
 import com.spectral.ttlfc.service.CardGame;
 import com.spectral.ttlfc.service.Host;
@@ -42,6 +43,11 @@ public class GameController {
 	public PlayerEntryResponse playerEntry(@RequestBody PlayerEntryRequest per) {
 		
 		return hostImpl.acceptPlayer(per);
+	}
+	
+	@RequestMapping(method=RequestMethod.GET, value="get-waiting-tables")
+	public Map<UUID, Table> getTables() {
+		return lobbyImpl.getWaitingTables();
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="my-lobby-status/{uuid}")
