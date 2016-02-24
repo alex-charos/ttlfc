@@ -52,7 +52,9 @@ public class HostImpl implements Host {
 	
 	public PlayerEntryResponse acceptPlayer(PlayerEntryRequest peReq) {
 		Player p = peReq.getPlayer();
-		p.setUuid(UUID.randomUUID());
+		if (p.getUuid() == null) {
+			p.setUuid(UUID.randomUUID());
+		}
 		PlayerEntryResponse per = new PlayerEntryResponse();
 		per.setPlayerToken(p.getUuid());
 		per.setResponse(PlayerResponseType.inWaitingRoom);
@@ -71,7 +73,7 @@ public class HostImpl implements Host {
 				lobbyImpl.getWaitingTables().remove(t.getId());
 				CardGame cg =  GameFactory.getGame(gameType, t.getPlayersWaiting());
 				cg.dealDeck(footballPlayerCardService.generateCards(10));
-
+				
 				UUID gameId = lobbyImpl.createCardGame(cg);
 				per.setGameToken(gameId);
 				per.setResponse(PlayerResponseType.enteredGame);
